@@ -20,19 +20,27 @@ const createElement = (types: IntrinsicTypes, props, internalInstanceHandler) =>
         case "PointLight":
             const pointLight = new THREE.PointLight(props.color, props.intensity, props.decay)
             pointLight.position.set(props.position.x, props.position.y, props.position.z)
+            pointLight.castShadow = true
+
+            pointLight.shadow.mapSize.width = 512
+            pointLight.shadow.mapSize.height = 512
+            
             return pointLight
         case "Plane":
-            const planeGeometry = new THREE.PlaneGeometry(5, 5, 1, 1)
-            const mesh2 = new THREE.Mesh(planeGeometry, new THREE.MeshPhongMaterial({ color: 0xFFFFFF }))
+            const planeGeometry = new THREE.PlaneGeometry(500, 500, 1, 1)
+            const mesh2 = new THREE.Mesh(planeGeometry, new THREE.MeshPhongMaterial({ color: 0x090909 }))
             mesh2.rotateX(-Math.PI / 2)
-            mesh2.position.set(0, 0.2, 0)
+            mesh2.position.set(0, -1, 0)
             mesh2.updateMatrix()
+            mesh2.receiveShadow = true
             return mesh2
         case "Box":
             const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2)
             // const material = new THREE.MeshLambertMaterial()
             // const material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, map: diffuseTexture }
             const mesh3 = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xFFFFFF }))
+            mesh3.receiveShadow = false
+            mesh3.castShadow = true
 
             mesh3.position.set(props.position.x, props.position.y, props.position.z)
             mesh3.updateMatrix()

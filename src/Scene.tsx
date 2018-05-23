@@ -10,113 +10,150 @@ import * as THREE from "three"
 
 import { Renderer3dReconciler } from "./Renderer3dReconciler"
 
-const FBXLoader = require("three-fbx-loader")
-
-const loader = new FBXLoader()
+export type Color = number
 
 export interface SceneProps {
     width: number
     height: number
 }
 
-import { TGALoader } from "./TGALoader"
+export type SceneAndCamera = {
+    scene: THREE.Scene
+    camera: THREE.Camera
+}
 
-const textureLoader = new THREE.TextureLoader()
-const diffuseTexture = textureLoader.load("test-character/hand_t.jpg")
+export type DisposeFunction = () => void
+export type NotifyFunction = () => void
+export type RegisterSceneAndCameraFunction = (sceneAndCamera: SceneAndCamera) => DisposeFunction
 
-export const Box: React.Component<{}> = "Box" as any
-export const AmbientLight: React.Component<{}> = "AmbientLight" as any
-export const PointLight: React.Component<{}> = "PointLight" as any
-export const Plane: React.Component<{}> = "Plane" as any
+import { Vector3 } from "./Vector"
 
-export class Scene extends React.PureComponent<SceneProps, {}> {
+export interface SceneContextStore {
+    registerSceneAndCamera: RegisterSceneAndCameraFunction
+    notifyUpdate: NotifyFunction
+}
+
+export interface BoxProps {
+    position: Vector3
+    children?: any
+}
+
+export const Box = (props: BoxProps): JSX.Element => { return React.createElement("Box", props, props.children )}
+
+export interface AmbientLightProps {
+    color: number 
+}
+
+export const AmbientLight = (props: AmbientLightProps): JSX.Element => { return React.createElement("AmbientLight", props)}
+
+export interface PointLightProps {
+    color: number
+    position: Vector3
+    intensity: number
+    decay: number
+}
+
+export const PointLight = (props: PointLightProps): JSX.Element => { return React.createElement("PointLight", props)}
+
+export interface PlaneProps {
+    
+}
+
+export const Plane = (props: PlaneProps): JSX.Element => { return React.createElement("Plane", props)}
+
+export interface SceneState {
+    sceneAndCameras: SceneAndCamera[]
+}
+
+export const SceneContext = React.createContext<SceneContextStore>({
+    registerSceneAndCamera: () => { return null },
+    notifyUpdate: () => { }
+})
+
+export class Scene extends React.PureComponent<SceneProps, SceneState> {
     private _mountNode: HTMLElement
 
     private _containerElement: HTMLElement
-    private _renderer: THREE.Renderer
-    private _scene: THREE.Scene
-    private _camera: THREE.Camera
-    
+    private _renderer: THREE.WebGLRenderer
+    // private _scene: THREE.Scene
+    // private _camera: THREE.Camera
+
+    constructor(props: SceneProps) {
+        super(props) 
+
+        this.state = {
+            sceneAndCameras: []
+        }
+    }
+
     public componentDidMount(): void {
         const { children, width, height } = this.props
-
         if (this._containerElement) {
 
-            this._camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 10)
-            this._camera.position.set(0, 2, 6)
-            this._camera.lookAt(new THREE.Vector3())
+            // this._camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 10)
+            // this._camera.position.set(0, 2, 6)
+            // this._camera.lookAt(new THREE.Vector3())
 
-            this._scene = new THREE.Scene()
+            // this._scene = new THREE.Scene()
+            // this._scene.background = new THREE.Color(0x6495ed)
 
 //             const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2)
 //             const material = new THREE.MeshNormalMaterial()
 
 //             const mesh = new THREE.Mesh(geometry, material)
 //             scene.add(mesh)
-            let mixers=[]
-
-            loader.load("test-character/hands-ascii-2013.FBX", (obj: any) => {
-
-                for(let i = 0; i< obj.children.length; i++) {
-
-                    const child = obj.children[i] as any
-                    if (child.material) {
-                        
-
-                       child.material = new THREE.MeshLambertMaterial({
-                           skinning: true,
-                           emissive: 0x0F0F0F,
-                           color: 0xFFFFFF,
-                           map: diffuseTexture,
-                       })
-                    }
-                    
-                }
-
-                const mixer = new THREE.AnimationMixer( obj );
-                mixers.push(mixer);
-                var action = mixer.clipAction( obj.animations[ 0 ] );
-                action.play();
-
-                const wrapperObj = new THREE.Object3D()
-                wrapperObj.add(obj)
-                wrapperObj.scale.set(0.01, 0.01, 0.01)
-
-                this._scene.add(wrapperObj)
-                const box = new THREE.Box3().setFromObject(wrapperObj)
-                
-
-                const center = new THREE.Vector3(-0.5 * (box.max.x - box.min.x), -0.5 * (box.max.y - box.min.y), -0.5 * (box.max.z - box.min.z))
-                wrapperObj.position.set(center.x + 0.7, center.y + 0.5, center.z + 4.2)
-                // wrapperObj.rotateY(Math.PI/2)
-            })
-
 
             this._renderer = new THREE.WebGLRenderer({ antialias: true})
+            this._renderer.shadowMap.enabled = true
+            this._renderer.shadowMap.type = THREE.PCFSoftShadowMap
             this._renderer.setSize(width, height)
             this._containerElement.appendChild(this._renderer.domElement)
 
-            window.setInterval(() => {
-                    for ( var i = 0; i < mixers.length; i ++ ) {
-						mixers[ i ].update(0.01);
-					}
-            }, 10)
-
-            this._mountNode = Renderer3dReconciler.createContainer(this._scene)
-            Renderer3dReconciler.updateContainer(children, this._mountNode, this)
+            // this._mountNode = Renderer3dReconciler.createContainer(this._scene)
+            // Renderer3dReconciler.updateContainer(children, this._mountNode, this)
         }
     }
 
     public componentDidUpdate(prevProps, prevState) {
         console.warn("componentDidUpdate")
 
-        Renderer3dReconciler.updateContainer(this.props.children, this._mountNode, this)
+        if (this.props.width !== prevProps.width || this.props.height !== prevProps.height) {
+            this._renderer.setSize(this.props.width, this.props.height)
+        }
 
-        this._renderer.render(this._scene, this._camera)
+        // Renderer3dReconciler.updateContainer(this.props.children, this._mountNode, this)
+
+        this._renderScene()
+
+        // this._renderer.render(this._scene, this._camera)
     }
 
     public render(): JSX.Element {
-        return <div ref={ref => {this._containerElement = ref}} />
+        return <SceneContext.Provider value={{
+            notifyUpdate: () => this._renderScene(),
+            registerSceneAndCamera: (sc: SceneAndCamera) => this._registerSceneAndCamera(sc),
+        }}>
+                <div ref={ref => {this._containerElement = ref}} style={{overflow: "hidden"}}>
+                    {this.props.children}
+                </div>
+            </SceneContext.Provider>
+    }
+
+     private _registerSceneAndCamera(sceneAndCamera: SceneAndCamera): DisposeFunction {
+        const updatedSceneAndCameras = [...this.state.sceneAndCameras, sceneAndCamera]
+        this.setState({
+            sceneAndCameras: updatedSceneAndCameras
+        })
+
+        return () => {
+            const filteredSceneAndCameras = this.state.sceneAndCameras.filter((f) => f !== sceneAndCamera)
+        }
+    }
+
+    private _renderScene(): void {
+        this.state.sceneAndCameras.forEach((sc) => {
+            this._renderer.render(sc.scene, sc.camera)
+        })
     }
 }
 
