@@ -22,11 +22,14 @@ const createBufferGeometryFromMesh = (mesh: Mesh): THREE.BufferGeometry => {
             bufferGeometry.addAttribute(va.name, new THREE.BufferAttribute(vertexData, va.size))
         }) 
     }
+    bufferGeometry.computeVertexNormals()
     return bufferGeometry
 }
 
 const createMaterialFromInfo = (material: MaterialInfo): any => {
     switch (material.type) {
+        case "basic":
+            return new THREE.MeshBasicMaterial({color: material.color})
         case "normal":
             return new THREE.MeshNormalMaterial()
         case "standard":

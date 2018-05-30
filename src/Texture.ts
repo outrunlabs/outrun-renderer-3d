@@ -19,7 +19,7 @@ export namespace Texture {
         const ext = Utility.getFileExtension(texturePath.toLowerCase())
         if (ext === "tga") {
             return loadTga(texturePath)     
-        }
+        } 
 
         throw new Error("No runtime loader available for: " + ext)
     }

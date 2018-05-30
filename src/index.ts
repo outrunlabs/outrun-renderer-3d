@@ -13,6 +13,7 @@ import { Mesh } from "./Components/Mesh"
 import { Material, StandardMaterial } from "./Components/Material"
 import { Skeleton } from "./Components/Skeleton"
 import { Bone } from "./Components/Bone"
+import { Terrain } from "./Components/Terrain"
 
 export const Components = {
     ...BaseComponents,
@@ -24,4 +25,5 @@ export const Components = {
     Plane,
     Skeleton,
     Bone,
+    Terrain,
 }

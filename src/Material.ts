@@ -25,6 +25,9 @@ export type MaterialInfo = {
     specularMap?: Texture
     bumpMap?: Texture
     emissiveIntensity?: number
+} | {
+    type: "basic",
+    color: number,
 }
 
 export interface MaterialProps {
