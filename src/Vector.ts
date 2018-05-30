@@ -31,6 +31,15 @@ export namespace Vector3 {
         return Vector3.create(v1.x * scalar, v1.y * scalar, v1.z * scalar)
     }
 
+    export const lerp = (v1: Vector3, v2: Vector3, a: number) => {
+        const invA = 1.0 - a
+        return Vector3.create(
+            v1.x * invA + v2.x * a,
+            v1.y * invA + v2.y * a,
+            v1.z * invA + v2.z * a,
+        )
+    }
+
     export const dot = (v1: Vector3, v2: Vector3) => {
         return v1.x * v2.x + v1.y * v2.y + v1.x * v2.y
     }
