@@ -19,7 +19,11 @@ export class Bone extends React.PureComponent<BoneProps, {}> {
 
         return <SkeletonContext.Consumer>{(args) => {
 
-            return <InnerBone skeleton={args.skeleton} boneName={this.props.boneName}>
+            if (!args.skeletonToBone) {
+                return null
+            }
+
+            return <InnerBone bone={args.skeletonToBone[this.props.boneName]}>
                 {this.props.children}
             </InnerBone>
         }}
@@ -28,8 +32,7 @@ export class Bone extends React.PureComponent<BoneProps, {}> {
 }
 
 export interface InnerBoneProps {
-    boneName: string
-    skeleton: THREE.Skeleton
+    bone: THREE.Bone
 }
 
 export class InnerBone extends React.PureComponent<InnerBoneProps, {}> {
@@ -37,16 +40,20 @@ export class InnerBone extends React.PureComponent<InnerBoneProps, {}> {
 
     public componentDidMount(): void {
         
-        if (this._object && this.props.boneName) {
+        if (this._object && this.props.bone) {
 
-            const bone: THREE.Bone = this.props.skeleton.bones[0]
+            const bone: THREE.Bone = this.props.bone
 
-            const pos = bone.matrixWorld.getPosition()
+            window.setInterval(() => {
+                
+            const pos = new THREE.Vector3().setFromMatrixPosition(bone.matrixWorld)
 
             if (bone) {
                 this._object.position.set(pos.x, pos.y, pos.z)
                 this._object.scale.set(10, 10, 10)
             }
+
+            }, 10)
         }
     }
 

@@ -19,3 +19,16 @@ export const wrapAsPromiseIfNot = <T>(c: T | Promise<T>): Promise<T> => {
 
     return Promise.resolve(c)
 }
+
+
+export interface SomethingWithChildren {
+    children: SomethingWithChildren[]
+}
+
+export const traverse = <T extends SomethingWithChildren>(items: T[], callback: (obj: T) => void) => {
+    for (let i = 0; i < items.length; i++) {
+        callback(items[i])
+
+        traverse(items[i].children, callback)
+    }
+}

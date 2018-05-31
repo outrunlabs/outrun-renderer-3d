@@ -27,6 +27,7 @@ import * as Utility from "./Utility"
 
 export interface SkinnedMesh {
     skeleton: THREE.Skeleton
+    animations: THREE.AnimationClip[]
 }
 
 
@@ -149,9 +150,13 @@ export namespace SkinnedMesh {
 
         return new Promise((res, rej) => {
 
-            fbxLoader.load(modelPath, (group: THREE.Group) => {
+            fbxLoader.load(modelPath, (group: any) => {
                 const convertedMesh = convertGroupToSkinnedMesh(group)
-                res(convertedMesh)
+                const mesh = {
+                    ...convertedMesh,
+                    animations: group.animations,
+                }
+                res(mesh)
             })
             
         })
