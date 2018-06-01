@@ -5,7 +5,7 @@ const FBXLoader = require("three-fbx-loader")
 const fbxLoader = new FBXLoader()
 
 
-import { Mesh } from "./Model"
+import { Mesh, convertBufferGeometryToMesh } from "./Model"
 
 import * as Utility from "./Utility"
 
@@ -27,6 +27,7 @@ import * as Utility from "./Utility"
 
 export interface SkinnedMesh {
     skeleton: THREE.Skeleton
+    skinnedMesh: Mesh
     animations: THREE.AnimationClip[]
 }
 
@@ -40,13 +41,18 @@ const convertGroupToSkinnedMesh = (bg: THREE.Group): SkinnedMesh => {
         }
 
         const sm = item as THREE.SkinnedMesh
+        const mesh = convertBufferGeometryToMesh(sm.geometry as any);
+        (mesh as any).bindMatrix = sm.bindMatrix;
+        (mesh as any).matrix = sm.matrix;
 
 //         const skeleton = getSkeletonFromThreeSkeleton(sm.skeleton)
 
 //         const convertedBackSkeleton = getThreeSkeletonFromSkeleton(skeleton)
 
         return {
+            skinnedMesh: mesh,
             skeleton: sm.skeleton,
+            animations: null,
         }
     }
 }

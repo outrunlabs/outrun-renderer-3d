@@ -7,48 +7,63 @@ import * as Utility from "./../Utility"
 import * as THREE from "three"
 
 import { Components } from "./index"
-import {InternalMeshWithMaterial} from "./InternalMeshWithMaterial"
+import { InternalMeshWithMaterial } from "./InternalMeshWithMaterial"
 
 import { MaterialContext, MaterialProps } from "./Material"
+import { SkeletonContext } from "./Skeleton"
 
 export interface MeshProps {
-   mesh: MeshGeometry | Promise<MeshGeometry>
+  mesh: MeshGeometry | Promise<MeshGeometry>
 }
 
 export interface MeshState {
-   loadedMesh: MeshGeometry 
+  loadedMesh: MeshGeometry
 }
 
 export class Mesh extends React.PureComponent<MeshProps, MeshState> {
+  constructor(props: MeshProps) {
+    super(props)
 
-    constructor(props: MeshProps) {
-        super(props)
+    this.state = {
+      loadedMesh: null,
+    }
+  }
 
-        this.state = {
-            loadedMesh: null,
-        }
+  public componentDidMount(): void {
+    const meshAsPromise = Utility.wrapAsPromiseIfNot<MeshGeometry>(
+      this.props.mesh
+    )
+
+    meshAsPromise.then(mesh => {
+      this.setState({
+        loadedMesh: mesh,
+      })
+    })
+  }
+
+  public render(): JSX.Element {
+    if (!this.state.loadedMesh) {
+      return null
     }
 
-    public componentDidMount(): void {
-
-        const meshAsPromise = Utility.wrapAsPromiseIfNot<MeshGeometry>(this.props.mesh)
-
-        meshAsPromise.then((mesh) => {
-            this.setState({
-                loadedMesh: mesh
-            })
-        })
-    }
-
-    public render(): JSX.Element {
-        if (!this.state.loadedMesh) {
-            return null    
-        }
-
-        return <MaterialContext.Consumer>{(val: MaterialProps) => {
-            return <InternalMeshWithMaterial mesh={this.state.loadedMesh} material={val.material} />
+    return (
+      <MaterialContext.Consumer>
+        {(val: MaterialProps) => {
+          return (
+            <SkeletonContext.Consumer>
+              {skeleton => {
+                return (
+                  <InternalMeshWithMaterial
+                    mesh={this.state.loadedMesh}
+                    material={val.material}
+                    skeleton={skeleton.skeleton}
+                  />
+                )
+              }}
+            </SkeletonContext.Consumer>
+          )
         }}
-        </MaterialContext.Consumer>
-    }
+      </MaterialContext.Consumer>
+    )
+  }
 }
-

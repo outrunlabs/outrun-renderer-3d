@@ -11,6 +11,7 @@ import { Object3D } from "./Object3D"
 export interface InternalMeshWithMaterialProps {
     mesh: Mesh
     material: MaterialInfo
+    skeleton: THREE.Skeleton
 }
 
 const createBufferGeometryFromMesh = (mesh: Mesh): THREE.BufferGeometry => {
@@ -23,6 +24,8 @@ const createBufferGeometryFromMesh = (mesh: Mesh): THREE.BufferGeometry => {
         }) 
     }
     bufferGeometry.computeVertexNormals()
+    bufferGeometry.computeBoundingBox()
+    bufferGeometry.computeBoundingSphere()
     return bufferGeometry
 }
 
@@ -50,8 +53,8 @@ const createMaterialFromInfo = (material: MaterialInfo): any => {
                 color: 0xFFFFFF,
                 
             })
-        default:
-            throw new Error("Unknown material type: " + material.type)
+        // default:
+        //     throw new Error("Unknown material type: " + material.type)
     }
 }
 
@@ -66,7 +69,25 @@ export class InternalMeshWithMaterial extends React.PureComponent<InternalMeshWi
             const geometry = createBufferGeometryFromMesh(this.props.mesh)
             const material = createMaterialFromInfo(this.props.material)
 
-            const mesh = new THREE.Mesh(geometry, material)
+            let mesh: THREE.Mesh | THREE.SkinnedMesh = null
+            if (this.props.skeleton && this.props.mesh.vertexData["skinWeight"] && this.props.mesh.vertexData["skinIndex"]) {
+                material.skinning = true
+                let skinnedmesh = new THREE.SkinnedMesh(geometry, material)
+                // skinnedmesh.matrix = (this.props.mesh as any).matrix
+                const bindMatrix = (this.props.mesh as any).bindMatrix
+                skinnedmesh.bind(this.props.skeleton, bindMatrix)
+                // skinnedmesh.scale.set(100, 100, 100)
+                // skinnedmesh.updateMatrixWorld()
+
+                // skinnedmesh.matrixAutoUpdate = true
+                
+                // skinnedmesh.position.set(0, -200, 0)
+                // skinnedmesh.updateMatrixWorld()
+                skinnedmesh.frustumCulled = false
+                mesh = skinnedmesh
+            } else {
+               mesh = new THREE.Mesh(geometry, material) 
+            }
             mesh.castShadow = true
             this._parentObject.add(mesh)
         }

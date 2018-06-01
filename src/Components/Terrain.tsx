@@ -57,8 +57,8 @@ export class Terrain extends React.PureComponent<TerrainProps, TerrainState> {
                     v4.x, v4.y, v4.z,
                     v3.x, v3.y, v3.z,
                     v1.x, v1.y, v1.z,
-                    v3.x, v3.y, v3.z
-                    v2.x, v2.y, v2.z,
+                    v3.x, v3.y, v3.z,
+                    v2.x, v2.y, v2.z
                 ]
             }
         }

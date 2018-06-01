@@ -28,7 +28,7 @@ export interface ModelMesh {
     material: Material
 }
 
-const convertBufferGeometryToMesh = (bg: THREE.BufferGeometry): Mesh => {
+export const convertBufferGeometryToMesh = (bg: any): Mesh => {
     const vertexAttributes = Object.keys(bg.attributes).map((bufferAttributeName) => {
         return {
             name: bufferAttributeName,

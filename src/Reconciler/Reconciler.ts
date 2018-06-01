@@ -42,6 +42,10 @@ export const createReconciler = <T>(core: ReconcilerCore<T>): Reconciler => {
     core.appendChild(parent, child)
   }
 
+  const insertBefore = (parent: T, child: T, beforeChild: T): void => {
+      core.appendChild(parent, child)
+  }
+
   const appendChildToContainer = (parent: T, child: T): void => {
     core.appendChild(parent, child)
   }
@@ -194,7 +198,7 @@ export const createReconciler = <T>(core: ReconcilerCore<T>): Reconciler => {
       commitMount: debuggerFunction("commitMount"),
       commitTextUpdate: debuggerFunction("commintTextUpdate"),
       commitUpdate: commitUpdate,
-      insertBefore: debuggerFunction("insertBefore"),
+      insertBefore: insertBefore,
       insertInContainerBefore: debuggerFunction("insertInContainerBefore"),
       removeChild: debuggerFunction("removeChild"),
       removeChildFromContainer: debuggerFunction("removeChildFromContainer"),

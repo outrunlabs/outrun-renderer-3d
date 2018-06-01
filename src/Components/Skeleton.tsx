@@ -26,7 +26,8 @@ export interface SkeletonContextState {
 }
 
 export const SkeletonContext = React.createContext<SkeletonContextState>({
-    skeleton: null
+    skeleton: null,
+    skeletonToBone: {}
 })
 
 export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> {
@@ -59,16 +60,15 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
             window.setInterval(() => {
                 anim += 0.1
                 this._updateBonesFromAnimationClip(anim)
-            }, 100)
+            }, 500)
 
             const helper = new THREE.SkeletonHelper(obj as any)
-            this._object.scale.set(0.02, 0.02, 0.02)
             this._object.add(helper)
         }
     }
 
     public componentDidUpdate(): void {
-        
+
     }
 
     public render(): JSX.Element {
@@ -90,6 +90,7 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
         if (!this.props.animation) {
             return
         }
+
         
         for (let i = 0; i < this.props.animation.tracks.length; i++) {
 
@@ -102,15 +103,18 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
             const val = interpolant.evaluate(time)
 
             switch (type) {
-                // case "scale":
-                // case "position":
-                //     // resolvedBone.position.set(val[0], val[1], val[2]);
-                //     (resolvedBone as any).updateMatrixWorld()
-                //     break
+                case "scale":
+                    // resolvedBone.scale.set(val[0], val[1], val[2])
+                    break
+                case "position":
+                    // resolvedBone.position.set(val[0], val[1] - 100, val[2])
+
+                    break
                 case "quaternion":
                     resolvedBone.quaternion.set(val[0], val[1], val[2], val[3]);
                     (resolvedBone as any).updateMatrixWorld()
                     break
+
                 default:
                     console.warn("Unknown animation type: " + type)
             }
