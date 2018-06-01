@@ -42,17 +42,24 @@ export class InnerBone extends React.PureComponent<InnerBoneProps, {}> {
         
         if (this._object && this.props.bone) {
 
+            this.props.bone.add(this._object)
+
             const bone: THREE.Bone = this.props.bone
 
             window.setInterval(() => {
                 
             const pos = new THREE.Vector3().setFromMatrixPosition(bone.matrixWorld)
             const quat = new THREE.Quaternion().setFromRotationMatrix(bone.matrixWorld)
+            // const scale = new THREE.Vector3().setFromMatrixScale(bone.matrixWorld)
+
+            const matrix = new THREE.Matrix4()
+                matrix.setPosition(pos)
+                matrix.setRotationFromQuaternion(quat)
 
             if (bone) {
-                this._object.position.set(pos.x, pos.y, pos.z)
-                this._object.rotation.setFromQuaternion(quat)
-                this._object.scale.set(10, 10, 10)
+                
+                this._object.matrix = matrix
+                this._object.scale.set(0.02, 0.02, 0.02)
             }
 
             }, 10)

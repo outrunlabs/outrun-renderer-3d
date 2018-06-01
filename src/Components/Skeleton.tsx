@@ -11,7 +11,6 @@ import { traverse } from "./../Utility"
 
 export interface SkeletonProps {
     skeleton: THREE.Skeleton
-    showSkeleton: boolean
     animation?: THREE.AnimationClip | null
     animationTime?: number
 }
@@ -45,12 +44,26 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
 
     public componentDidMount(): void {
         
-        if (this._object && this.props.showSkeleton) {
+        if (this._object) {
             const transform = new THREE.Matrix4()
-            const obj = {
-                matrixWorld: new THREE.Matrix4(),
-                children: this.props.skeleton.bones,
-            }
+
+            const boneObject = new THREE.Object3D()
+
+            // Dirty hack.... 
+            let root: any =null
+            this.props.skeleton.bones.forEach((b) => {
+                if (b.parent.type !== "Bone") {
+                    // root = b.parent.parent
+                   boneObject.add(b.parent.parent) 
+                    root = b.parent.parent
+                }
+            })
+
+            // const helperObject: any = {
+            //     matrixWorld: new THREE.Matrix4(),
+            //     children: [b.parent]
+            // }
+
             this._updateBoneDictionary()
             this.setState({
                 skeletonToBone: this._boneDictionary
@@ -62,8 +75,9 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
                 this._updateBonesFromAnimationClip(anim)
             }, 500)
 
-            const helper = new THREE.SkeletonHelper(obj as any)
-            this._object.add(helper)
+            // this._object.rotateZ(Math.PI / 2)
+            this._object.position.set(0, -100, 0)
+            this._object.add(boneObject)
         }
     }
 

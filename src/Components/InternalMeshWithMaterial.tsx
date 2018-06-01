@@ -76,6 +76,8 @@ export class InternalMeshWithMaterial extends React.PureComponent<InternalMeshWi
                 // skinnedmesh.matrix = (this.props.mesh as any).matrix
                 const bindMatrix = (this.props.mesh as any).bindMatrix
                 skinnedmesh.bind(this.props.skeleton, bindMatrix)
+
+                window["bindMatrix"] = bindMatrix
                 // skinnedmesh.scale.set(100, 100, 100)
                 // skinnedmesh.updateMatrixWorld()
 
