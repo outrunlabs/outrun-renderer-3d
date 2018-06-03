@@ -51,6 +51,8 @@ export class Scene extends React.PureComponent<SceneProps, SceneState> {
     // private _scene: THREE.Scene
     // private _camera: THREE.Camera
 
+    private _shouldRender
+
     constructor(props: SceneProps) {
         super(props) 
 
@@ -63,9 +65,10 @@ export class Scene extends React.PureComponent<SceneProps, SceneState> {
         const { children, width, height } = this.props
         if (this._containerElement) {
 
-            this._renderer = new THREE.WebGLRenderer({ antialias: true})
+            this._renderer = new THREE.WebGLRenderer({ antialias: true })
             this._renderer.shadowMap.enabled = true
             this._renderer.shadowMap.type = THREE.PCFSoftShadowMap
+            this._renderer.autoClear = false
             this._renderer.setSize(width, height)
             this._containerElement.appendChild(this._renderer.domElement)
         }
@@ -92,19 +95,30 @@ export class Scene extends React.PureComponent<SceneProps, SceneState> {
     }
 
      private _registerSceneAndCamera(sceneAndCamera: SceneAndCamera): DisposeFunction {
-        const updatedSceneAndCameras = [...this.state.sceneAndCameras, sceneAndCamera]
-        this.setState({
-            sceneAndCameras: updatedSceneAndCameras
-        })
+         // HACK: `setTimeout` is used here because, without it, multiple cameras
+         // could try and call `setState` in the same event loop, and there's no guarantee
+         // that `this.state` will have been updated at that point..
+         window.setTimeout(() => {
+            const updatedSceneAndCameras = [...this.state.sceneAndCameras, sceneAndCamera]
+
+            this.setState({
+                sceneAndCameras: updatedSceneAndCameras
+            })
+         }, 0)
 
         return () => {
             const filteredSceneAndCameras = this.state.sceneAndCameras.filter((f) => f !== sceneAndCamera)
+            this.setState({
+                sceneAndCameras: filteredSceneAndCameras
+            })
         }
     }
 
     private _renderScene(): void {
         this.state.sceneAndCameras.forEach((sc) => {
-            this._renderer.render(sc.scene, sc.camera)
+            // sc.scene.background = 0xFF000
+            this._renderer.clearDepth()
+            this._renderer.render(sc.scene, sc.camera, null, false)
         })
     }
 }

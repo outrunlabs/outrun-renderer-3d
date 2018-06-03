@@ -17,11 +17,24 @@ export namespace Texture {
 
     export const fromFile = async (texturePath: string): Promise<Texture> => {
         const ext = Utility.getFileExtension(texturePath.toLowerCase())
-        if (ext === "tga") {
-            return loadTga(texturePath)     
-        } 
+        switch (ext) {
+            case "tga":
+                return loadTga(texturePath)
+            case "jpg":
+                return loadJpg(texturePath)
+            default:
+                throw new Error("No runtime loader available for: " + ext)
+        }
+    }
 
-        throw new Error("No runtime loader available for: " + ext)
+    const loadJpg = async (jpgTexturePath): Promise<Texture> => {
+        return new Promise<Texture>((res, reject) => {
+            const imageLoader = new THREE.TextureLoader()
+            imageLoader.load(jpgTexturePath, (result) => {
+                res(createFromRaw(result))
+            })
+            
+        })
     }
 
     const loadTga = async (tgaTexturePath): Promise<Texture> => {
