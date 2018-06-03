@@ -21,9 +21,12 @@ export type Transforms = {
 const IdentityMatrix = new THREE.Matrix4()
 const EmptyTransforms: Transforms[] = []
 
+export type ReferenceFunction = (ref: THREE.Object3D) => void
+
 export interface TransformProps {
     
     transform?: Transforms[]
+    objectRef?: ReferenceFunction
 }
 
 const isNumber = (obj: any) => typeof obj === "number"
@@ -47,6 +50,11 @@ export class Transform extends React.PureComponent<TransformProps, {}> {
     private _obj: THREE.Object3D
 
     public componentDidMount(): void {
+
+        if (this.props.objectRef && this._obj) {
+            this.props.objectRef(this._obj)
+        }
+
        this._updateTransform() 
     }
 

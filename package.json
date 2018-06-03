@@ -29,6 +29,7 @@
     "fbjs": "0.8.16",
     "react": "^16.4.0",
     "react-reconciler": "^0.10.0",
+    "react-test-renderer": "^16.4.0",
     "three": "^0.92.0",
     "three-fbx-loader": "^1.0.3",
     "three-obj-loader": "^1.1.3"
