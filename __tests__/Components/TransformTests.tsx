@@ -12,7 +12,6 @@ const renderComponent = (component: JSX.Element): void => {
 }
 
 describe("createReconciler", () => {
-
     it("sets default properties", () => {
         let test: THREE.Object3D
         renderComponent(<Components.Transform objectRef={(obj) => test = obj}/>)
@@ -28,5 +27,17 @@ describe("createReconciler", () => {
         renderComponent(<Components.Transform objectRef={(obj) => test = obj} transform={[{translate: {x: 1, y: 2, z: 3}}]}/>)
         expect(test.position).toEqual(new THREE.Vector3(1, 2, 3))
     })
+
+    it("appends child", () => {
+        
+        let test: THREE.Object3D
+        let innerTest: THREE.Object3D
+        renderComponent(<Components.Transform objectRef={(obj) => test = obj}>
+                            <Components.Transform objectRef={(obj) => innerTest = obj} />
+                    </Components.Transform>)
+
+        expect(test.children.length).toEqual(1)
+        expect(test.children[0]).toBe(innerTest)
+    }
 
 })
