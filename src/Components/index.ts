@@ -10,14 +10,7 @@ export namespace Components {
 
     // export const Box = (props: BoxProps): JSX.Element => { return React.createElement("Box", props, props.children )}
 
-    export interface GroupProps {
-        position?: Vector3
-        children?: any
-    }
-
     // export const Group = (props: GroupProps): JSX.Element => { return React.createElement("Group", props, [...props.children]) }
-
-    export const Group = "Group" as any
 
     export const AmbientLight = "AmbientLight" as any
 
