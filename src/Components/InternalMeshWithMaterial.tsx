@@ -23,7 +23,7 @@ const createBufferGeometryFromMesh = (mesh: Mesh): THREE.BufferGeometry => {
             bufferGeometry.addAttribute(va.name, new THREE.BufferAttribute(vertexData, va.size))
         }) 
     }
-    bufferGeometry.computeVertexNormals()
+    // bufferGeometry.computeVertexNormals()
     bufferGeometry.computeBoundingBox()
     bufferGeometry.computeBoundingSphere()
     return bufferGeometry
