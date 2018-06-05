@@ -88,11 +88,7 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
                 skeletonToBone: this._boneDictionary
             })
 
-            let anim = 0
-            window.setInterval(() => {
-                anim += 0.01
-                this._updateBonesFromAnimationClip(anim)
-            }, 10)
+            this._updateBonesFromAnimationClip(this.props.animationTime || 0)
 
             // this._object.rotateZ(Math.PI / 2)
             // this._object.position.set(0, -100, 0)
