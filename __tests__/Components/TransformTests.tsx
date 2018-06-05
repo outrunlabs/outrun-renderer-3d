@@ -5,10 +5,16 @@ import { Camera, Components } from "./../../src"
 
 const renderer = require("react-test-renderer")
 
-const renderComponent = (component: JSX.Element): void => {
-        renderer.create((<Components.Camera lookAt={{x: 0, y: 0, z: 1}} position={{x: 0, y: 0, z:0 }} aspectRatio={1} near={0} far={500}>
+const renderComponent = (component: JSX.Element): any => {
+        return renderer.create((<Components.Camera lookAt={{x: 0, y: 0, z: 1}} position={{x: 0, y: 0, z:0 }} aspectRatio={1} near={0} far={500}>
                 {component}
             </Components.Camera>))
+}
+
+const ToggleComponent = (props: { visible: boolean, objectRef: any }) => {
+    return <Components.Transform objectRef={props.objectRef}>
+            { props.visible ? <Components.Transform /> : null}
+        </Components.Transform>
 }
 
 describe("createReconciler", () => {
@@ -38,6 +44,16 @@ describe("createReconciler", () => {
 
         expect(test.children.length).toEqual(1)
         expect(test.children[0]).toBe(innerTest)
-    }
+    })
 
+    it("removes element on update", () => {
+        let test: THREE.Object3D
+        let element = renderComponent(<ToggleComponent visible={true} objectRef={(obj) => test = obj} />)
+
+        expect(test.children.length).toEqual(1)
+
+        let updatedTest: THREE.Object3D
+        element.update(<ToggleComponent visible={false} objectRef={() => {}}/>)
+        expect(test.children).toBe([])
+    })
 })
