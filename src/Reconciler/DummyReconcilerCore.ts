@@ -21,6 +21,10 @@ export class DummyReconcilerCore implements ReconcilerCore<any> {
       return createDummyElement(type, props)
   }
 
+  public removeChild(parent: DummyElement, child: DummyElement): void {
+      parent.children = parent.children.filter((c) => c !== child)
+  }
+
   public updateElement(
     instance: any,
     type: string,

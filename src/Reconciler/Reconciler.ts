@@ -21,6 +21,7 @@ export interface ReconcilerCore<T> {
     oldProps: any,
     newProps: any
   ): void
+   removeChild(parent: T, child: T): void
 }
 
 export type Reconciler = any
@@ -40,6 +41,11 @@ export const createReconciler = <T>(core: ReconcilerCore<T>): Reconciler => {
 
   const appendChild = (parent: T, child: T): void => {
     core.appendChild(parent, child)
+  }
+
+  const removeChild = (parent: T, child: T): void => {
+      console.log("Remove child!")
+    core.removeChild(parent, child)
   }
 
   const insertBefore = (parent: T, child: T, beforeChild: T): void => {
@@ -200,7 +206,7 @@ export const createReconciler = <T>(core: ReconcilerCore<T>): Reconciler => {
       commitUpdate: commitUpdate,
       insertBefore: insertBefore,
       insertInContainerBefore: debuggerFunction("insertInContainerBefore"),
-      removeChild: debuggerFunction("removeChild"),
+      removeChild: removeChild,
       removeChildFromContainer: debuggerFunction("removeChildFromContainer"),
     },
   })

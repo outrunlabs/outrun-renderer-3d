@@ -27,6 +27,10 @@ export class ThreeReconcilerCore implements ReconcilerCore<THREE.Object3D> {
     parent.add(child)
   }
 
+  public removeChild(parent: THREE.Object3D, child: THREE.Object3D): void {
+    parent.remove(child)
+  }
+
   public createElement(type: string, props: any): THREE.Object3D {
 
       if (Factory[type] && Factory[type].create) {

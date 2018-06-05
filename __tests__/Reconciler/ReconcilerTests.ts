@@ -28,4 +28,20 @@ describe("createReconciler", () => {
         expect(dummyRoot.children.length).toBe(1)
         expect(dummyRoot.children[0].children.length).toBe(1)
     })
+
+    it("remove nested element", () => {
+        
+        const dummyRoot = createDummyElement("ROOT", {})
+        const reconciler = createReconciler(new DummyReconcilerCore())
+        const mountNode = reconciler.createContainer(dummyRoot)
+
+        // First render pass - add a child
+        reconciler.updateContainer(React.createElement("TAG1", {key: 1}, React.createElement("TAG_NESTED", {})),  mountNode, null)
+
+        // Second render pass - remove a child
+        reconciler.updateContainer(React.createElement("TAG1", { key: 1}), mountNode, null)
+
+        expect(dummyRoot.children.length).toBe(1)
+        expect(dummyRoot.children[0].children.length).toBe(0)
+    })
 })
