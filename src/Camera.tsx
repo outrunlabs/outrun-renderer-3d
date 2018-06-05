@@ -85,7 +85,6 @@ export class InnerCamera extends React.PureComponent<InnerCameraProps, {}> {
 
         this._reconciler.updateContainer(this.props.children, this._mountNode, this)
         this.props.notifyUpdate()
-
     }
 
     public render(): JSX.Element {

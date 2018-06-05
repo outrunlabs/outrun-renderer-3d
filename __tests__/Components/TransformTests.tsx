@@ -3,17 +3,28 @@ import * as THREE from "three"
 
 import { Camera, Components } from "./../../src"
 
+import { ThreeReconcilerCore, createReconciler } from "./../../src/Reconciler"
+
 const renderer = require("react-test-renderer")
 
+
 const renderComponent = (component: JSX.Element): any => {
-        return renderer.create((<Components.Camera lookAt={{x: 0, y: 0, z: 1}} position={{x: 0, y: 0, z:0 }} aspectRatio={1} near={0} far={500}>
-                {component}
-            </Components.Camera>))
+
+        const reconcilerCore = new ThreeReconcilerCore()
+        const reconciler = createReconciler<THREE.Object3D>(reconcilerCore)
+
+        const scene = new THREE.Scene()
+        const mountNode =reconciler.createContainer(scene)
+        reconciler.updateContainer(component, mountNode, null)
+
+        return {
+            update: (newComponent) => reconciler.updateContainer(newComponent, mountNode, null)
+        }
 }
 
 const ToggleComponent = (props: { visible: boolean, objectRef: any }) => {
     return <Components.Transform objectRef={props.objectRef}>
-            { props.visible ? <Components.Transform /> : null}
+            { props.visible ? <Components.Transform key={"test"} /> : null }
         </Components.Transform>
 }
 
@@ -51,8 +62,8 @@ describe("createReconciler", () => {
 
         expect(test.children.length).toEqual(1)
 
-        let updatedTest: THREE.Object3D
-        element.update(<ToggleComponent visible={false} objectRef={() => {}}/>)
-        expect(test.children).toBe([])
+        element.update(<ToggleComponent visible={false} objectRef={(obj) => {}}/>)
+        
+        expect(test.children.length).toEqual(0)
     })
 })

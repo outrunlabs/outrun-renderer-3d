@@ -44,7 +44,6 @@ export const createReconciler = <T>(core: ReconcilerCore<T>): Reconciler => {
   }
 
   const removeChild = (parent: T, child: T): void => {
-      console.log("Remove child!")
     core.removeChild(parent, child)
   }
 
@@ -207,7 +206,7 @@ export const createReconciler = <T>(core: ReconcilerCore<T>): Reconciler => {
       insertBefore: insertBefore,
       insertInContainerBefore: debuggerFunction("insertInContainerBefore"),
       removeChild: removeChild,
-      removeChildFromContainer: debuggerFunction("removeChildFromContainer"),
+      removeChildFromContainer: removeChild,
     },
   })
 }

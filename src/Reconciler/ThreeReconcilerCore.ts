@@ -24,11 +24,12 @@ const Factory = {
 
 export class ThreeReconcilerCore implements ReconcilerCore<THREE.Object3D> {
   public appendChild(parent: THREE.Object3D, child: THREE.Object3D): void {
+      console.log("appendChild")
     parent.add(child)
   }
 
   public removeChild(parent: THREE.Object3D, child: THREE.Object3D): void {
-    parent.remove(child)
+      parent.remove(child)
   }
 
   public createElement(type: string, props: any): THREE.Object3D {
