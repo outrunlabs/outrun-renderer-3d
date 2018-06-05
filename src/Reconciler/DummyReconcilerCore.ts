@@ -14,16 +14,10 @@ export const createDummyElement = (type: string, props: any) => ({
 
 export class DummyReconcilerCore implements ReconcilerCore<any> {
   public appendChild(parent: DummyElement, child: DummyElement): void {
-      console.log("appendChild")
-
-      console.dir(parent)
-      console.dir(child)
-
       parent.children.push(child)
   }
 
   public createElement(type: string, props: any): DummyElement{
-      console.log("createElement: " + type)
       return createDummyElement(type, props)
   }
 

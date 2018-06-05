@@ -35,7 +35,6 @@ describe("createReconciler", () => {
     })
 
     it("appends child", () => {
-        
         let test: THREE.Object3D
         let innerTest: THREE.Object3D
         renderComponent(<Components.Transform objectRef={(obj) => test = obj}>
