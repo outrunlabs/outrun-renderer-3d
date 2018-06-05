@@ -23,7 +23,6 @@ const createBufferGeometryFromMesh = (mesh: Mesh): THREE.BufferGeometry => {
             bufferGeometry.addAttribute(va.name, new THREE.BufferAttribute(vertexData, va.size))
         }) 
     }
-    // bufferGeometry.computeVertexNormals()
     bufferGeometry.computeBoundingBox()
     bufferGeometry.computeBoundingSphere()
     return bufferGeometry
@@ -77,7 +76,6 @@ export class InternalMeshWithMaterial extends React.PureComponent<InternalMeshWi
                 const bindMatrix = (this.props.mesh as any).bindMatrix
                 skinnedmesh.bind(this.props.skeleton, bindMatrix)
 
-                window["bindMatrix"] = bindMatrix
                 // skinnedmesh.scale.set(100, 100, 100)
                 // skinnedmesh.updateMatrixWorld()
 

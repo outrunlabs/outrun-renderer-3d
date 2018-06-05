@@ -20,6 +20,7 @@ export namespace Texture {
         switch (ext) {
             case "tga":
                 return loadTga(texturePath)
+            case "bmp":
             case "jpg":
                 return loadJpg(texturePath)
             default:

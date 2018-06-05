@@ -49,15 +49,34 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
 
             const boneObject = new THREE.Object3D()
 
-            // Dirty hack.... 
-            let root: any =null
-            this.props.skeleton.bones.forEach((b) => {
-                if (b.parent.type !== "Bone") {
-                    // root = b.parent.parent
-                   boneObject.add(b.parent.parent) 
-                    root = b.parent.parent
+
+            let currentBone = this.props.skeleton.bones[0]
+            let hierarchyup = []
+            let parent = currentBone.parent
+            while (parent) {
+                hierarchyup.push(parent)
+               parent = parent.parent 
+            }            
+
+            const secondToLastParent = hierarchyup[hierarchyup.length - 2]
+             
+            boneObject.add(secondToLastParent)
+
+            traverse(secondToLastParent as any, (t: any) => {
+                if (t.type !== "Bone") {
+                t.visible = false
                 }
             })
+
+            // Dirty hack.... 
+            // let root: any =null
+            // this.props.skeleton.bones.forEach((b) => {
+            //     if (b.parent.type !== "Bone") {
+            //         // root = b.parent.parent
+            //        boneObject.add(b.parent.parent) 
+            //         root = b.parent.parent
+            //     }
+            // })
 
             // const helperObject: any = {
             //     matrixWorld: new THREE.Matrix4(),
@@ -76,7 +95,7 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
             }, 10)
 
             // this._object.rotateZ(Math.PI / 2)
-            this._object.position.set(0, -100, 0)
+            // this._object.position.set(0, -100, 0)
             this._object.add(boneObject)
         }
     }
@@ -97,7 +116,13 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
     private _updateBoneDictionary(): void {
         this._boneDictionary = {}
 
-        traverse(this.props.skeleton.bones, (bone) => this._boneDictionary[bone.name] = bone)
+        traverse(this.props.skeleton.bones, (bone) => {
+            this._boneDictionary[bone.name] = bone
+
+            if (bone.type !== "Bone") {
+                bone.visible = false
+            }
+        })
     }
 
     private _updateBonesFromAnimationClip(time: number): void {
@@ -115,6 +140,10 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
             const interpolant = track.createInterpolant()
             const resolvedBone = this._boneDictionary[bone]
             const val = interpolant.evaluate(time)
+
+            if (!resolvedBone) {
+                continue
+            }
 
             switch (type) {
                 case "scale":
