@@ -7,6 +7,8 @@ import * as Utility from "./../Utility"
 
 import { createMaterialFromInfo, ThreeMaterialContext } from "./THREE/ThreeMaterialContext"
 
+import * as THREE from "three"
+
 export interface MaterialProps {
    material: MaterialInfo
 }
@@ -125,4 +127,62 @@ export class StandardMaterial extends React.PureComponent<StandardMaterialProps,
             {this.props.children}
             </ThreeMaterialContext.Provider>
     }
+}
+
+export interface ShaderMaterialProps {
+    fragmentShader: string
+    vertexShader: string
+    uniforms: { [key: string]: any }
+}
+
+export interface ShaderMaterialState {
+    material: THREE.ShaderMaterial
+}
+
+export class ShaderMaterial extends React.PureComponent<ShaderMaterialProps, ShaderMaterialState> {
+
+    constructor(props: ShaderMaterialProps) {
+        super(props)
+
+        this.state = {
+            material: null
+        }
+    }
+
+    public componentDidMount(): void {
+        const shaderMaterial = new THREE.ShaderMaterial({
+            fragmentShader: this.props.fragmentShader,
+            vertexShader: this.props.vertexShader,
+            uniforms: this.props.uniforms,
+        })
+
+        this.setState({
+            material: shaderMaterial
+        })
+    }
+
+    public componentDidUpdate(oldProps: ShaderMaterialProps): void {
+        if (this.state.material && oldProps.uniforms !== this.props.uniforms) {
+
+            Object.keys(this.props.uniforms).forEach((key) => {
+                
+                const currentVal = this.state.material.uniforms[key]
+                const val = this.props.uniforms[key]
+                if (val.value !== currentVal.value) {
+                   currentVal.value = val.value 
+                }
+            })
+        }
+    }
+
+    public render(): JSX.Element {
+        if (!this.state.material) {
+           return null 
+        }
+
+        return <ThreeMaterialContext.Provider value={{ material: this.state.material }}>
+                {this.props.children}
+            </ThreeMaterialContext.Provider>
+    }
+    
 }

@@ -10,7 +10,7 @@ import { Components as SceneComponents }from "./Scene"
 import { Camera } from "./Camera"
 import { Plane } from "./Components/Plane"
 import { Mesh } from "./Components/Mesh"
-import { Material, StandardMaterial } from "./Components/Material"
+import { Material, StandardMaterial, ShaderMaterial } from "./Components/Material"
 import { Skeleton, SkeletalRoot } from "./Components/Skeleton"
 import { Bone } from "./Components/Bone"
 import { Group, Transform } from "./Components/Transform"
@@ -22,6 +22,7 @@ export const Components = {
     Camera,
     Material,
     StandardMaterial,
+    ShaderMaterial,
     Mesh,
     Plane,
     Skeleton,
