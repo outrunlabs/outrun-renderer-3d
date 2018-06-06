@@ -14,6 +14,7 @@ import { Mesh as MeshComponent } from "./Mesh"
 export type TerrainHeightFunction = (x: number, z: number) => number
 
 export interface TerrainProps {
+    position: Vector2
     size: Vector2
     divisions: Vector2
 
@@ -53,12 +54,18 @@ export class Terrain extends React.PureComponent<TerrainProps, TerrainState> {
             const v =  Vector3.create(hL - hR, 2, hD - hU)
             return Vector3.normalize(v)
         }
+        
+        let startX, startZ = 0
+        if (this.props.position) {
+            startX = this.props.position.x
+            startZ = this.props.position.y
+        }
 
         for (let x = 0; x < this.props.divisions.x; x++) {
             for (let y = 0; y < this.props.divisions.y; y++) {
                 
-                const adjX = x * xScaleFactor
-                const adjZ = y * xScaleFactor
+                const adjX = startX + x * xScaleFactor
+                const adjZ = startZ + y * yScaleFactor
                 
                 const v1 = Vector3.create(adjX, this.props.getHeight(adjX, adjZ), adjZ)
                 const v2 = Vector3.create(adjX + xScaleFactor, this.props.getHeight(adjX + xScaleFactor, adjZ), adjZ)
