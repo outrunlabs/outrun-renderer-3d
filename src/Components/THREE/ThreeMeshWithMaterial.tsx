@@ -2,15 +2,17 @@ import * as React from "react"
 
 import * as THREE from "three"
 
-import { Vector3 } from "./../Vector"
-import { Mesh } from "./../Model"
-import { MaterialInfo } from "./../Material"
+import { Vector3 } from "./../../Vector"
+import { Mesh } from "./../../Model"
+import { MaterialInfo } from "./../../Material"
 
-import { Object3D } from "./Object3D"
+import { Object3D } from "./../Object3D"
+
+import { ThreeMaterialContext } from "./ThreeMaterialContext"
 
 export interface InternalMeshWithMaterialProps {
     mesh: Mesh
-    material: MaterialInfo
+    material: THREE.Material
     skeleton: THREE.Skeleton
 }
 
@@ -28,36 +30,7 @@ const createBufferGeometryFromMesh = (mesh: Mesh): THREE.BufferGeometry => {
     return bufferGeometry
 }
 
-const createMaterialFromInfo = (material: MaterialInfo): any => {
-    switch (material.type) {
-        case "basic":
-            return new THREE.MeshBasicMaterial({color: material.color})
-        case "normal":
-            return new THREE.MeshNormalMaterial()
-        case "standard":
-            return new THREE.MeshStandardMaterial({
-                map: material.diffuseMap ? material.diffuseMap.raw : null,
-                normalMap: material.normalMap ? material.normalMap.raw : null,
-                emissiveMap: material.emissiveMap ? material.emissiveMap.raw : null,
-                emissiveIntensity: material.emissiveIntensity || 0,
-                color: 0xFFFFFF,
-            })
-        case "phong":
-            return new THREE.MeshPhongMaterial({
-                map: material.diffuseMap ? material.diffuseMap.raw : null,
-                normalMap: material.normalMap ? material.normalMap.raw : null,
-                emissiveMap: material.emissiveMap ? material.emissiveMap.raw : null,
-                specularMap: material.specularMap ? material.specularMap.raw : null,
-                emissiveIntensity: material.emissiveIntensity || 0,
-                color: 0xFFFFFF,
-                
-            })
-        // default:
-        //     throw new Error("Unknown material type: " + material.type)
-    }
-}
-
-export class InternalMeshWithMaterial extends React.PureComponent<InternalMeshWithMaterialProps, {}> {
+export class ThreeMeshWithMaterial extends React.PureComponent<InternalMeshWithMaterialProps, {}> {
 
     private _parentObject: THREE.Object3D
     private _meshObject: THREE.Object3D
@@ -66,7 +39,7 @@ export class InternalMeshWithMaterial extends React.PureComponent<InternalMeshWi
 
         if (this._parentObject) {
             const geometry = createBufferGeometryFromMesh(this.props.mesh)
-            const material = createMaterialFromInfo(this.props.material)
+            const material = this.props.material as any
 
             let mesh: THREE.Mesh | THREE.SkinnedMesh = null
             if (this.props.skeleton && this.props.mesh.vertexData["skinWeight"] && this.props.mesh.vertexData["skinIndex"]) {

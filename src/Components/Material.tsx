@@ -5,6 +5,8 @@ import { Texture } from "./../Texture"
 
 import * as Utility from "./../Utility"
 
+import { createMaterialFromInfo, ThreeMaterialContext } from "./THREE/ThreeMaterialContext"
+
 export interface MaterialProps {
    material: MaterialInfo
 }
@@ -13,17 +15,40 @@ const NormalMaterial: MaterialInfo = {
     type: "normal"
 }
 
-const DefaultMaterial = NormalMaterial
 
-export const MaterialContext = React.createContext<MaterialProps>({
-    material: DefaultMaterial,
-})
+export interface MaterialState {
+    material: THREE.Material
+}
 
-export class Material extends React.PureComponent<MaterialProps, {}> {
+export class Material extends React.PureComponent<MaterialProps, MaterialState> {
+
+    constructor(props: MaterialProps) {
+        super(props)
+
+        this.state = {
+            material: null
+        }
+    }
+
+    public componentDidMount(): void {
+
+        if (this.props.material) {
+            this.setState({
+                material: createMaterialFromInfo(this.props.material)
+            })
+        }
+        
+    }
+
     public render(): JSX.Element {
-        return <MaterialContext.Provider value={this.props}>
+
+        if (!this.state.material) {
+            return null
+        }
+
+        return <ThreeMaterialContext.Provider value={this.state}>
                 {this.props.children}
-            </MaterialContext.Provider>
+            </ThreeMaterialContext.Provider>
     }
 }
 
@@ -39,7 +64,7 @@ export interface StandardMaterialProps {
 
 export interface StandardMaterialState {
     hasLoaded: boolean
-    materialInfo: MaterialProps,
+    material: THREE.Material,
 }
 
 export class StandardMaterial extends React.PureComponent<StandardMaterialProps, StandardMaterialState> {
@@ -49,7 +74,7 @@ export class StandardMaterial extends React.PureComponent<StandardMaterialProps,
 
         this.state = {
             hasLoaded: false,
-            materialInfo: null,
+            material: null,
         }
     }
 
@@ -85,22 +110,19 @@ export class StandardMaterial extends React.PureComponent<StandardMaterialProps,
 
             this.setState({
                 hasLoaded: true,
-                materialInfo: { 
-                    material,
-                }
+                material: createMaterialFromInfo(material),
             })
         })
         
     }
-
 
     public render(): JSX.Element {
         if (!this.state.hasLoaded) {
             return null
         }
 
-        return <MaterialContext.Provider value={this.state.materialInfo}>
+        return <ThreeMaterialContext.Provider value={{ material: this.state.material}}>
             {this.props.children}
-            </MaterialContext.Provider>
+            </ThreeMaterialContext.Provider>
     }
 }

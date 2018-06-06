@@ -7,9 +7,11 @@ import * as Utility from "./../Utility"
 import * as THREE from "three"
 
 import { Components } from "./index"
-import { InternalMeshWithMaterial } from "./InternalMeshWithMaterial"
 
-import { MaterialContext, MaterialProps } from "./Material"
+
+import { ThreeMaterialContext } from "./THREE/ThreeMaterialContext"
+import { ThreeMeshWithMaterial } from "./THREE/ThreeMeshWithMaterial"
+
 import { SkeletonContext } from "./Skeleton"
 
 export interface MeshProps {
@@ -47,13 +49,13 @@ export class Mesh extends React.PureComponent<MeshProps, MeshState> {
     }
 
     return (
-      <MaterialContext.Consumer>
-        {(val: MaterialProps) => {
+      <ThreeMaterialContext.Consumer>
+        {(val: {material: THREE.Material}) => {
           return (
             <SkeletonContext.Consumer>
               {skeleton => {
                 return (
-                  <InternalMeshWithMaterial
+                  <ThreeMeshWithMaterial
                     mesh={this.state.loadedMesh}
                     material={val.material}
                     skeleton={skeleton.skeleton}
@@ -63,7 +65,7 @@ export class Mesh extends React.PureComponent<MeshProps, MeshState> {
             </SkeletonContext.Consumer>
           )
         }}
-      </MaterialContext.Consumer>
+      </ThreeMaterialContext.Consumer>
     )
   }
 }
