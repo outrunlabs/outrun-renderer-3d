@@ -204,7 +204,7 @@ export const createReconciler = <T>(core: ReconcilerCore<T>): Reconciler => {
       commitTextUpdate: debuggerFunction("commintTextUpdate"),
       commitUpdate: commitUpdate,
       insertBefore: insertBefore,
-      insertInContainerBefore: debuggerFunction("insertInContainerBefore"),
+      insertInContainerBefore: insertBefore,
       removeChild: removeChild,
       removeChildFromContainer: removeChild,
     },

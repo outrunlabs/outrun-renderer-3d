@@ -26,13 +26,21 @@ import * as Utility from "./Utility"
 // }
 
 export interface SkinnedMesh {
+    skinnedMeshParts: SkinnedMeshParts[]
+    skeletalRoot: THREE.Object3D
+    animations: THREE.AnimationClip[]
+}
+
+export interface SkinnedMeshParts {
     skeleton: THREE.Skeleton
     skinnedMesh: Mesh
-    animations: THREE.AnimationClip[]
 }
 
 
 const convertGroupToSkinnedMesh = (bg: THREE.Group): SkinnedMesh => {
+
+    const meshParts: SkinnedMeshParts[] = []
+
     for (var i = 0; i < bg.children.length; i++) {
         const item = bg.children[i]
 
@@ -49,11 +57,33 @@ const convertGroupToSkinnedMesh = (bg: THREE.Group): SkinnedMesh => {
 
 //         const convertedBackSkeleton = getThreeSkeletonFromSkeleton(skeleton)
 
-        return {
+        meshParts.push({
             skinnedMesh: mesh,
             skeleton: sm.skeleton,
-            animations: null,
+        })
+    }
+
+    const firstMeshPart = meshParts[0]
+    let currentBone = meshParts[0].skeleton.bones[0]
+    let hierarchyup = []
+    let parent = currentBone.parent
+    while (parent) {
+        hierarchyup.push(parent)
+       parent = parent.parent 
+    }            
+
+    const secondToLastParent = hierarchyup[hierarchyup.length - 2]
+
+    Utility.traverse(secondToLastParent as any, (t: any) => {
+        if (t.type !== "Bone") {
+        t.visible = false
         }
+    })
+
+    return {
+        skinnedMeshParts: meshParts,
+        animations: (bg as any).animations,
+        skeletalRoot: secondToLastParent,
     }
 }
 
@@ -158,11 +188,7 @@ export namespace SkinnedMesh {
 
             fbxLoader.load(modelPath, (group: any) => {
                 const convertedMesh = convertGroupToSkinnedMesh(group)
-                const mesh = {
-                    ...convertedMesh,
-                    animations: group.animations,
-                }
-                res(mesh)
+                res(convertedMesh)
             })
             
         })

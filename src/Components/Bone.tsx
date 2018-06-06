@@ -56,10 +56,9 @@ export class InnerBone extends React.PureComponent<InnerBoneProps, {}> {
                 matrix.setPosition(pos);
                 matrix.makeRotationFromQuaternion(quat);
 
-            if (bone) {
+            if (bone && this._object) {
                 
                 this._object.matrix = matrix
-                this._object.scale.set(0.02, 0.02, 0.02)
             }
 
             }, 10)

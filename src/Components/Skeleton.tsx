@@ -9,8 +9,29 @@ import { Object3D } from "./Object3D"
 
 import { traverse } from "./../Utility"
 
+export interface SkeletalRootProps {
+    skeletonRoot: THREE.Object3D
+}
+
+export class SkeletalRoot extends React.PureComponent<SkeletalRootProps, {}> {
+    private _object: THREE.Object3D
+
+    public componentDidMount(): void {
+        if (this._object) {
+            this._object.add(this.props.skeletonRoot)
+        }
+    }
+    
+    public render(): JSX.Element {
+        return <Object3D ref={(obj) => this._object = obj }>
+        {this.props.children}
+        </Object3D>
+    }
+}
+
 export interface SkeletonProps {
     skeleton: THREE.Skeleton
+    skeletonRoot: THREE.Group
     animation?: THREE.AnimationClip | null
     animationTime?: number
 }
@@ -47,27 +68,6 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
         if (this._object) {
             const transform = new THREE.Matrix4()
 
-            const boneObject = new THREE.Object3D()
-
-
-            let currentBone = this.props.skeleton.bones[0]
-            let hierarchyup = []
-            let parent = currentBone.parent
-            while (parent) {
-                hierarchyup.push(parent)
-               parent = parent.parent 
-            }            
-
-            const secondToLastParent = hierarchyup[hierarchyup.length - 2]
-             
-            boneObject.add(secondToLastParent)
-
-            traverse(secondToLastParent as any, (t: any) => {
-                if (t.type !== "Bone") {
-                t.visible = false
-                }
-            })
-
             // Dirty hack.... 
             // let root: any =null
             // this.props.skeleton.bones.forEach((b) => {
@@ -90,14 +90,22 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
 
             this._updateBonesFromAnimationClip(this.props.animationTime || 0)
 
+            // let t = 0
+            // window.setInterval(() => {
+            //     this._updateBonesFromAnimationClip(t)
+            //     t += 0.01
+            // }, 10)
+
             // this._object.rotateZ(Math.PI / 2)
             // this._object.position.set(0, -100, 0)
-            this._object.add(boneObject)
         }
     }
 
-    public componentDidUpdate(): void {
+    public componentDidUpdate(oldProps: SkeletonProps): void {
 
+        if (this.props.animationTime !== oldProps.animationTime) {
+            this._updateBonesFromAnimationClip(this.props.animationTime)
+        }
     }
 
     public render(): JSX.Element {
@@ -112,7 +120,7 @@ export class Skeleton extends React.PureComponent<SkeletonProps, SkeletonState> 
     private _updateBoneDictionary(): void {
         this._boneDictionary = {}
 
-        traverse(this.props.skeleton.bones, (bone) => {
+        traverse([this.props.skeletonRoot], (bone) => {
             this._boneDictionary[bone.name] = bone
 
             if (bone.type !== "Bone") {
