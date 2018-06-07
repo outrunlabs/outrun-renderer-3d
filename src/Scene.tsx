@@ -12,6 +12,7 @@ export type Color = number
 
 import { Vector3 } from "./Vector"
 
+import { createReconciler, ThreeReconcilerCore } from "./Reconciler"
 
 export type SceneAndCamera = {
     scene: THREE.Scene
@@ -20,30 +21,19 @@ export type SceneAndCamera = {
 
 export type DisposeFunction = () => void
 export type NotifyFunction = () => void
-export type RegisterSceneAndCameraFunction = (sceneAndCamera: SceneAndCamera) => DisposeFunction
-
-export interface SceneContextStore {
-    registerSceneAndCamera: RegisterSceneAndCameraFunction
-    notifyUpdate: NotifyFunction
-}
-
-export const SceneContext = React.createContext<SceneContextStore>({
-    registerSceneAndCamera: () => { return null },
-    notifyUpdate: () => { }
-})
 
 export namespace Components {
 
-export interface SceneProps {
+export interface RendererProps {
     width: number
     height: number
 }
 
-export interface SceneState {
+export interface RendererState {
     sceneAndCameras: SceneAndCamera[]
 }
 
-export class Scene extends React.PureComponent<SceneProps, SceneState> {
+export class Renderer extends React.PureComponent<RendererProps, RendererState> {
     private _mountNode: HTMLElement
 
     private _containerElement: HTMLElement
@@ -51,9 +41,11 @@ export class Scene extends React.PureComponent<SceneProps, SceneState> {
     // private _scene: THREE.Scene
     // private _camera: THREE.Camera
 
+    private _reconciler: any
+    private _rootObject: THREE.Object3D
     private _shouldRender
 
-    constructor(props: SceneProps) {
+    constructor(props: RendererProps) {
         super(props) 
 
         this.state = {
@@ -71,6 +63,13 @@ export class Scene extends React.PureComponent<SceneProps, SceneState> {
             this._renderer.autoClear = false
             this._renderer.setSize(width, height)
             this._containerElement.appendChild(this._renderer.domElement)
+
+            this._rootObject = new THREE.Object3D()
+            const reconcilerCore = new ThreeReconcilerCore()
+            this._reconciler = createReconciler<THREE.Object3D>(reconcilerCore)
+
+            this._mountNode = this._reconciler.createContainer(this._rootObject)
+            this._reconciler.updateContainer(this.props.children, this._mountNode, this)
         }
     }
 
@@ -80,45 +79,23 @@ export class Scene extends React.PureComponent<SceneProps, SceneState> {
             this._renderer.setSize(this.props.width, this.props.height)
         }
 
+        this._reconciler.updateContainer(this.props.children, this._mountNode, this)
+
         this._renderScene()
     }
 
     public render(): JSX.Element {
-        return <SceneContext.Provider value={{
-            notifyUpdate: () => this._renderScene(),
-            registerSceneAndCamera: (sc: SceneAndCamera) => this._registerSceneAndCamera(sc),
-        }}>
-                <div ref={ref => {this._containerElement = ref}} style={{overflow: "hidden"}}>
-                    {this.props.children}
-                </div>
-            </SceneContext.Provider>
-    }
-
-     private _registerSceneAndCamera(sceneAndCamera: SceneAndCamera): DisposeFunction {
-         // HACK: `setTimeout` is used here because, without it, multiple cameras
-         // could try and call `setState` in the same event loop, and there's no guarantee
-         // that `this.state` will have been updated at that point..
-         window.setTimeout(() => {
-            const updatedSceneAndCameras = [...this.state.sceneAndCameras, sceneAndCamera]
-
-            this.setState({
-                sceneAndCameras: updatedSceneAndCameras
-            })
-         }, 0)
-
-        return () => {
-            const filteredSceneAndCameras = this.state.sceneAndCameras.filter((f) => f !== sceneAndCamera)
-            this.setState({
-                sceneAndCameras: filteredSceneAndCameras
-            })
-        }
+            return <div ref={ref => {this._containerElement = ref}} style={{overflow: "hidden"}} />
     }
 
     private _renderScene(): void {
-        this.state.sceneAndCameras.forEach((sc) => {
-            // sc.scene.background = 0xFF000
+        this._rootObject.children.forEach((sc: THREE.Scene) => {
+
+            const camera: THREE.Camera = sc.userData
             this._renderer.clearDepth()
-            this._renderer.render(sc.scene, sc.camera, null, false)
+            this._renderer.render(sc, camera, null, false)
+
+            
         })
     }
 }

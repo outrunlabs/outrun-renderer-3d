@@ -81,6 +81,9 @@ export class ThreeReconcilerCore implements ReconcilerCore<THREE.Object3D> {
                 obj5.position.set(props.position.x, props.position.y, props.position.z)
             }
             return obj5
+      case "Scene":
+            const scene = new THREE.Scene()
+            return scene
       case "Group":
         const obj = new THREE.Object3D()
             if (props.position) {
