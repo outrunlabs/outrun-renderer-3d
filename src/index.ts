@@ -5,6 +5,7 @@ export * from "./SkinnedMesh"
 export * from "./TerrainMesh"
 export * from "./Texture"
 export * from "./Vector"
+export * from "./Quaternion"
 
 import { Components as BaseComponents }from "./Components"
 import { Components as SceneComponents }from "./Scene"
@@ -16,6 +17,7 @@ import { Skeleton, SkeletalRoot } from "./Components/Skeleton"
 import { Bone } from "./Components/Bone"
 import { Group, Transform } from "./Components/Transform"
 import { Terrain } from "./Components/Terrain"
+import { Sound } from "./Components/Sound"
 
 export const Components = {
     ...BaseComponents,
@@ -30,6 +32,7 @@ export const Components = {
     SkeletalRoot,
     Bone,
     Group,
+    Sound,
     Terrain,
     Transform,
 }

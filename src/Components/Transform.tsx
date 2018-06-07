@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as THREE from "three"
 import { Vector3 } from "./../Vector"
+import { Quaternion } from "./../Quaternion"
 import { Mesh } from "./../Model"
 
 import { Object3D } from "./Object3D"
@@ -8,6 +9,8 @@ export type Radians = number
 
 export type Transforms = {
     translate: Vector3
+} | {
+    quaternion: Quaternion
 } | {
     rotateX: Radians
 } | {
@@ -42,8 +45,9 @@ const applyTransformToObject = (obj: THREE.Object3D, transform: any): void => {
         obj.rotateZ(transform.rotateZ)
     } else if (isNumber(transform.scale)) {
         obj.scale.setScalar(transform.scale)
+    } else if (transform.quaternion) {
+        obj.quaternion.set(transform.quaternion.x, transform.quaternion.y, transform.quaternion.z, transform.quaternion.w)
     }
-
 }
 
 export class Transform extends React.PureComponent<TransformProps, {}> {

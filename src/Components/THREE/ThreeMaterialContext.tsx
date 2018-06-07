@@ -25,7 +25,7 @@ export const createMaterialFromInfo = (material: MaterialInfo): any => {
                 map: material.diffuseMap ? material.diffuseMap.raw : null,
                 normalMap: material.normalMap ? material.normalMap.raw : null,
                 emissiveMap: material.emissiveMap ? material.emissiveMap.raw : null,
-                emissiveIntensity: material.emissiveIntensity || 0,
+                emissiveIntensity: material.emissiveIntensity || 1,
                 color: 0xFFFFFF,
             })
         case "phong":
@@ -34,7 +34,8 @@ export const createMaterialFromInfo = (material: MaterialInfo): any => {
                 normalMap: material.normalMap ? material.normalMap.raw : null,
                 emissiveMap: material.emissiveMap ? material.emissiveMap.raw : null,
                 specularMap: material.specularMap ? material.specularMap.raw : null,
-                emissiveIntensity: material.emissiveIntensity || 0,
+                emissiveIntensity: material.emissiveIntensity || 1,
+                emissive: material.emissiveMap ? 0xFFFFFF : 0x000000,
                 color: 0xFFFFFF,
                 
             })

@@ -17,6 +17,8 @@ import { Scene } from "./Components/Scene"
 // import { Renderer3dReconciler } from "./Renderer3dReconciler"
 import { NotifyFunction, SceneAndCamera, DisposeFunction } from "./Scene"
 
+import { AudioListenerContext } from "./Components/THREE/AudioListenerContext"
+
 const DEFAULT_FOV = 70
 
 export interface CameraProps {
@@ -35,12 +37,25 @@ export class Camera extends React.PureComponent<CameraProps, {}> {
 }
 
 
-export class InnerCamera extends React.PureComponent<CameraProps, {}> {
+export interface CameraState {
+    listener: THREE.AudioListener
+}
+
+export class InnerCamera extends React.PureComponent<CameraProps, CameraState> {
     private _scene: THREE.Scene
     private _camera: THREE.PerspectiveCamera
 
+    constructor(props: CameraProps) {
+        super(props)
+
+        this.state = {
+            listener: null,
+        }
+    }
+
     public componentDidMount(): void {
         if (this._scene) {
+
         
             this._scene.fog = new THREE.Fog(0x000303, 1, 50)
 
@@ -49,6 +64,12 @@ export class InnerCamera extends React.PureComponent<CameraProps, {}> {
             this._camera.lookAt(new THREE.Vector3(this.props.lookAt.x, this.props.lookAt.y, this.props.lookAt.z))
 
             this._scene.userData = this._camera
+
+            const listener = new THREE.AudioListener()
+            this._camera.add(listener)
+
+            this.setState({listener})
+
         }
     }
 
@@ -68,7 +89,9 @@ export class InnerCamera extends React.PureComponent<CameraProps, {}> {
 
     public render(): JSX.Element {
         return <Scene ref={(scene) => this._scene = scene}>
+            <AudioListenerContext.Provider value={this.state}>
             {this.props.children}
+            </AudioListenerContext.Provider>
         </Scene>
     }
 

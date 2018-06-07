@@ -9,7 +9,9 @@ import { Object3D } from "./Object3D"
 
 import { traverse } from "./../Utility"
 
-const audioLoader = new THREE.AudioLoader()
+const audioLoader : any = new THREE.AudioLoader()
+
+import { AudioListenerContext } from "./THREE/AudioListenerContext"
 
 export interface SoundProps {
     soundFile: string
@@ -20,18 +22,55 @@ export interface SoundProps {
 
 
 export class Sound extends React.PureComponent<SoundProps, {}> {
-    private _object: THREE.Object3D
+
+    public render(): JSX.Element {
+        return <AudioListenerContext.Consumer>{(context) => {
+
+            if (!context || !context.listener) {
+                return null
+            }
+
+            return <InnerSound {...this.props} listener={context.listener} />
+            
+        }}
+        </AudioListenerContext.Consumer>
+    }
+}
+
+export interface InnerSoundProps extends SoundProps {
+    listener: THREE.AudioListener
+}
+
+export class InnerSound extends React.PureComponent<InnerSoundProps, {}> {
+    
+    private _containerObject: THREE.Object3D
+    private _sound: THREE.PositionalAudio
 
     public componentDidMount(): void {
-        if (this._object) {
-            this._object.add(this.props.skeletonRoot)
+        if (this._containerObject) {
+            
+            this._sound = new THREE.PositionalAudio(this.props.listener)
+
+            audioLoader.load(this.props.soundFile, (buffer) => {
+
+                this._sound.setBuffer(buffer)
+                this._sound.setRefDistance(1)
+                this._sound.setVolume(0.5)
+                if (this.props.loop) {
+                    this._sound.setLoop(false)
+                }
+
+                    
+                this._sound.play()
+
+            })
+
+            this._containerObject.add(this._sound)
         }
     }
-    
+
     public render(): JSX.Element {
-        return <Object3D ref={(obj) => this._object = obj }>
-        {this.props.children}
-        </Object3D>
+        return <Object3D ref={(obj) => this._containerObject = obj} />
     }
 }
 
