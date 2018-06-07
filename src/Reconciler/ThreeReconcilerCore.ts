@@ -94,7 +94,7 @@ export class ThreeReconcilerCore implements ReconcilerCore<THREE.Object3D> {
         // const material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, map: diffuseTexture }
         const mesh3 = new THREE.Mesh(
           geometry,
-          new THREE.MeshPhongMaterial({ color: 0xffffff })
+          new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff })
         )
         mesh3.receiveShadow = false
         mesh3.castShadow = true

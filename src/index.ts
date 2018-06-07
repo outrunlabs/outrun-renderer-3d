@@ -2,6 +2,7 @@ export * from "./Camera"
 export * from "./Material"
 export * from "./Model"
 export * from "./SkinnedMesh"
+export * from "./TerrainMesh"
 export * from "./Texture"
 export * from "./Vector"
 

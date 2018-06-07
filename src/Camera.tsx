@@ -50,6 +50,8 @@ export class InnerCamera extends React.PureComponent<InnerCameraProps, {}> {
 
     public componentDidMount(): void {
             this._scene = new THREE.Scene()
+        
+            this._scene.fog = new THREE.Fog(0x000303, 1, 50)
 
 
             this._camera = new THREE.PerspectiveCamera(this.props.fov || DEFAULT_FOV, this.props.aspectRatio || 1, this.props.near, this.props.far)
