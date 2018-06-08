@@ -55,3 +55,5 @@ Copyright 2018 Outrun Labs, LLC.
 outrun-renderer-3d is licensed under the [GPL v3.0](./LICENSE), intended for educational and non-commercial use.
 
 For commercial use, we have alternative licenses available. Contact license@outrunlabs.com for more information.
+
+Note that bundled software, such as THREE.js, have their own set of license terms.
