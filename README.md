@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/outrunlabs/outrun-renderer-3d.svg?branch=master)](https://travis-ci.org/outrunlabs/outrun-renderer-3d) [![codecov](https://codecov.io/gh/outrunlabs/outrun-renderer-3d/branch/master/graph/badge.svg)](https://codecov.io/gh/outrunlabs/outrun-renderer-3d) [![npm](https://img.shields.io/npm/v/outrun-renderer-3d.svg)](https://www.npmjs.com/package/outrun-renderer-3d) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-Renderer strategy for 3d
+3D Components, based on React
 
 ## Motivation
 
