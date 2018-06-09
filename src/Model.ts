@@ -1,4 +1,3 @@
-
 import * as THREE from "three"
 
 const FBXLoader = require("three-fbx-loader")
@@ -10,13 +9,15 @@ OBJLoader(THREE)
 import * as Utility from "./Utility"
 
 import { Material } from "./Material"
+import { TerrainMesh } from "./TerrainMesh"
+import { Vector2 } from "./Vector"
 
 export interface MeshVertexAttributeInfo {
     name: string
     size: number
 }
 
-export type AttributeToData = {[attributeName: string]: any}
+export type AttributeToData = { [attributeName: string]: any }
 
 export interface Mesh {
     vertexAttributes: MeshVertexAttributeInfo[]
@@ -29,7 +30,7 @@ export interface ModelMesh {
 }
 
 export const convertBufferGeometryToMesh = (bg: any): Mesh => {
-    const vertexAttributes = Object.keys(bg.attributes).map((bufferAttributeName) => {
+    const vertexAttributes = Object.keys(bg.attributes).map(bufferAttributeName => {
         return {
             name: bufferAttributeName,
             size: bg.attributes[bufferAttributeName].itemSize,
@@ -37,7 +38,7 @@ export const convertBufferGeometryToMesh = (bg: any): Mesh => {
     })
 
     let data: AttributeToData = {}
-    const vertexData = Object.keys(bg.attributes).forEach((name) => {
+    const vertexData = Object.keys(bg.attributes).forEach(name => {
         data[name] = bg.attributes[name].array
     })
 
@@ -48,11 +49,10 @@ export const convertBufferGeometryToMesh = (bg: any): Mesh => {
 }
 
 export namespace Mesh {
-
     export const fromFile = async (modelPath: string): Promise<Mesh[]> => {
         const ext = Utility.getFileExtension(modelPath.toLowerCase())
 
-        switch(ext) {
+        switch (ext) {
             case "obj":
                 return await loadMeshFromObj(modelPath)
             default:
@@ -60,14 +60,19 @@ export namespace Mesh {
         }
     }
 
-    const loadMeshFromObj = (modelPath: string): Promise<Mesh[]> => {
+    export const createPlane = (
+        size: number,
+        position: Vector2 = Vector2.zero(),
+        divisions: number = 16,
+    ): Mesh => {
+        return TerrainMesh.fromHeightFunction(size, divisions, position, () => 0)
+    }
 
+    const loadMeshFromObj = (modelPath: string): Promise<Mesh[]> => {
         const objLoader = new THREE.OBJLoader()
 
         return new Promise((res, rej) => {
-
             objLoader.load(modelPath, (group: THREE.Group) => {
-
                 let ret: Mesh[] = []
 
                 group.children.forEach((child: THREE.Mesh) => {
@@ -80,11 +85,8 @@ export namespace Mesh {
 
                 res(ret)
             })
-            
         })
-        
     }
-    
 }
 
 // export interface Model {
@@ -100,19 +102,19 @@ export namespace Mesh {
 //     export const fromFile = async (modelPath: string): Promise<Model> => {
 //         const ext = Utility.getFileExtension(modelPath.toLowerCase())
 //         if (ext === "fbx") {
-//             return loadFbx(modelPath)     
+//             return loadFbx(modelPath)
 //         }
 
 //         throw new Error("No runtime loader available for: " + ext)
-        
+
 //     }
 
 //     const loadFbx = async (fbxModelPath: string): Promise<Model> => {
 //         return new Promise<Model>((res, reject) => {
 //             fbxLoader.load(fbxModelPath, (result: any) => {
 //                 res(createFromRaw(result))
-//             })  
+//             })
 //         })
 //     }
-    
+
 // }
